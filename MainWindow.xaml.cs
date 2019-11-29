@@ -76,8 +76,11 @@ namespace Noppe_Note_Taking_App
             TextBoxTitle.Document.Blocks.Clear();
             TextBoxDescription.Document.Blocks.Clear();
             selectedNoteToAdd = (Note)DisplayNotes.SelectedItem;
-            TextBoxTitle.Document.Blocks.Add(new Paragraph(new Run(selectedNoteToAdd.NoteTitle.ToString())));
-            TextBoxDescription.Document.Blocks.Add(new Paragraph(new Run(selectedNoteToAdd.NoteDescription.ToString())));
+            if (selectedNoteToAdd != null)
+            {
+                TextBoxTitle.Document.Blocks.Add(new Paragraph(new Run(selectedNoteToAdd.NoteTitle.ToString())));
+                TextBoxDescription.Document.Blocks.Add(new Paragraph(new Run(selectedNoteToAdd.NoteDescription.ToString())));
+            }
             TextBoxTitle.IsEnabled = false;
             TextBoxDescription.IsEnabled = false;
             ButtonEdit.IsEnabled = true;
@@ -94,17 +97,33 @@ namespace Noppe_Note_Taking_App
             }
             else if (GetButtonContent(ButtonEdit) == "Save")
             {
-                // To Do saving code here
-                using (var db = new NoppeDBEntities())
+                if (selectedNoteToAdd != null)
                 {
+                    var noteID = selectedNoteToAdd.NoteID;
+                    selectedNoteToAdd = new Note()
+                    {
+                        NoteID = noteID,
+                        NoteTitle = new TextRange(TextBoxTitle.Document.ContentStart, TextBoxTitle.Document.ContentEnd).Text,
+                        NoteDescription = new TextRange(TextBoxDescription.Document.ContentStart, TextBoxDescription.Document.ContentEnd).Text
+                    };
+                    // To Do saving code here
+                    using (var db = new NoppeDBEntities())
+                    {
+                        var noteToEdit = db.Notes.Find(this.selectedNoteToAdd.NoteID);
+                        noteToEdit.NoteDescription = this.selectedNoteToAdd.NoteDescription;
+                        noteToEdit.NoteTitle = this.selectedNoteToAdd.NoteTitle;
+                        db.SaveChanges();
+                        DisplayNotes.ItemsSource = null; // reset listbox
+                        listOfNotes = db.Notes.ToList();
+                        DisplayNotes.ItemsSource = listOfNotes;
+                    }
 
+                    TextBoxTitle.Document.Blocks.Clear();
+                    TextBoxDescription.Document.Blocks.Clear();
+                    TextBoxTitle.IsEnabled = false;
+                    TextBoxDescription.IsEnabled = false;
+                    ButtonEdit.Content = "Edit";
                 }
-
-                TextBoxTitle.Document.Blocks.Clear();
-                TextBoxDescription.Document.Blocks.Clear();
-                TextBoxTitle.IsEnabled = false;
-                TextBoxDescription.IsEnabled = false;
-                ButtonEdit.Content = "Edit";
             }
         }
 
