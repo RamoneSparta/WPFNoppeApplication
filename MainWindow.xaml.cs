@@ -20,14 +20,17 @@ namespace Noppe_Note_Taking_App
     /// </summary>
     public partial class MainWindow : Window
     {
+        #region Global Variables
         List<Note> listOfNotes = new List<Note>();
         Note selectedNoteToAdd = new Note();
+        #endregion
 
+        #region Public MainWindow
         public MainWindow()
         {
             InitializeComponent();
             /*
-             * If you are using the inner join
+             * If you are using the inner join:
             using (var db = new TaskDBEntities)
             {
                 // Inner join
@@ -53,7 +56,9 @@ namespace Noppe_Note_Taking_App
 
             InitiliseTheCode();
         }
+        #endregion
 
+        #region Initialising 
         public void InitiliseTheCode()
         {
             using (var db = new NoppeDBEntities())
@@ -63,16 +68,61 @@ namespace Noppe_Note_Taking_App
             DisplayNotes.ItemsSource = listOfNotes;
             DisplayNotes.DisplayMemberPath = "NoteTitle";
         }
+        #endregion
 
+        #region Textbox: On Text Change
         private void TextBoxSearch_TextChanged(object sender, TextChangedEventArgs e)
         {
+            
             // SQL Query based off of the ComboBox selection
-        }
+            using (var db = new NoppeDBEntities())
+            {
+                listOfNotes = new List<Note>();
+                if (((ComboBoxItem)ComboBoxSearch.SelectedItem).Content.ToString() == "Title")
+                {
+                    var queryForSeachBar =
+                        (
+                            from notes in db.Notes
+                            where notes.NoteTitle.Contains(TextBoxSearch.Text)
+                            orderby notes.NoteTitle
+                            select notes
 
+                        ).ToList();
+                    foreach (Note note in queryForSeachBar)
+                    {
+                        listOfNotes.Add(note);
+                    }
+                    DisplayNotes.ItemsSource = listOfNotes;
+                    DisplayNotes.DisplayMemberPath = "NoteTitle";
+                }
+                else if (((ComboBoxItem)ComboBoxSearch.SelectedItem).Content.ToString() == "Text")
+                {
+                    var queryForSeachBar =
+                        (
+                            from notes in db.Notes
+                            where notes.NoteDescription.Contains(TextBoxSearch.Text)
+                            orderby notes.NoteDescription
+                            select notes
+
+                         ).ToList();
+                    foreach (Note note in queryForSeachBar)
+                    {
+                        listOfNotes.Add(note);
+                    }
+                    DisplayNotes.ItemsSource = listOfNotes;
+                    DisplayNotes.DisplayMemberPath = "NoteDescription";
+                }
+            }
+        }
+        #endregion
+
+        #region Displaynotes: Section Changed
         private void DisplayNotes_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             TextBoxTitle.IsEnabled = true;
             TextBoxDescription.IsEnabled = true;
+            ButtonEdit.IsEnabled = true;
+            ButtonDelete.IsEnabled = true;
             TextBoxTitle.Document.Blocks.Clear();
             TextBoxDescription.Document.Blocks.Clear();
             selectedNoteToAdd = (Note)DisplayNotes.SelectedItem;
@@ -86,7 +136,17 @@ namespace Noppe_Note_Taking_App
             ButtonEdit.IsEnabled = true;
             ButtonDelete.IsEnabled = true;
         }
+        #endregion
 
+        #region Get button Content
+        private string GetButtonContent(Button o)
+        {
+            //Button name = (Button)o;
+            return o.Content.ToString();
+        }
+        #endregion
+
+        #region Edit: Button
         private void ButtonEdit_Click(object sender, RoutedEventArgs e)
         {
             if (GetButtonContent(ButtonEdit) == "Edit")
@@ -123,16 +183,14 @@ namespace Noppe_Note_Taking_App
                     TextBoxTitle.IsEnabled = false;
                     TextBoxDescription.IsEnabled = false;
                     ButtonEdit.Content = "Edit";
+                    ButtonDelete.IsEnabled = false;
+                    ButtonEdit.IsEnabled = false;
                 }
             }
         }
+        #endregion
 
-        private string GetButtonContent(Button o)
-        {
-            //Button name = (Button)o;
-            return o.Content.ToString();
-        }
-
+        #region Add: Button
         private void ButttonAdd_Click(object sender, RoutedEventArgs e)
         {
             if (GetButtonContent(ButtonAdd) == "Add")
@@ -165,7 +223,9 @@ namespace Noppe_Note_Taking_App
                 TextBoxTitle.Document.Blocks.Clear();
             }
         }
+        #endregion
 
+        #region Delete: Button
         private void ButtonDelete_Click(object sender, RoutedEventArgs e)
         {
             if (GetButtonContent(ButtonDelete)=="Delete")
@@ -191,6 +251,8 @@ namespace Noppe_Note_Taking_App
                 TextBoxDescription.Document.Blocks.Clear();
             }
         }
+        #endregion
+
     }
 
 
