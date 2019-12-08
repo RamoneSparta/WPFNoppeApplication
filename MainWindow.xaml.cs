@@ -253,6 +253,111 @@ namespace Noppe_Note_Taking_App
         }
         #endregion
 
+
+        #region new CRUD operations
+        #region Edit: Button
+        private void Edit_Click(object sender, RoutedEventArgs e)
+        {
+            if (GetButtonContent(ButtonEdit) == "Edit")
+            {
+                ButtonEdit.Content = "Save";
+                TextBoxTitle.IsEnabled = true;
+                TextBoxDescription.IsEnabled = true;
+            }
+            else if (GetButtonContent(ButtonEdit) == "Save")
+            {
+                if (selectedNoteToAdd != null)
+                {
+                    var noteID = selectedNoteToAdd.NoteID; // Gets the previous note id so it knows where to update it
+                    // when redoing the this function I noticed that I didn't need 
+                    // to make another note object I can just assign the textboxes directly to the fields in the db
+                    using (var db = new NoppeDBEntities())
+                    {
+                        var editedNote = db.Notes.Find(this.selectedNoteToAdd.NoteID); // finds the note in the database with the id from the selected note
+                        editedNote.NoteDescription = new TextRange(TextBoxTitle.Document.ContentStart, TextBoxTitle.Document.ContentEnd).Text;
+                        editedNote.NoteTitle = new TextRange(TextBoxDescription.Document.ContentStart, TextBoxDescription.Document.ContentEnd).Text;
+                        db.SaveChanges();
+                        DisplayNotes.ItemsSource = null; // reset listbox
+                        listOfNotes = db.Notes.ToList();
+                        DisplayNotes.ItemsSource = listOfNotes;
+                    }
+
+                    TextBoxTitle.Document.Blocks.Clear();
+                    TextBoxDescription.Document.Blocks.Clear();
+                    TextBoxTitle.IsEnabled = false;
+                    TextBoxDescription.IsEnabled = false;
+                    ButtonDelete.IsEnabled = false;
+                    ButtonEdit.IsEnabled = false;
+                    ButtonEdit.Content = "Edit";
+                }
+            }
+        }
+        #endregion
+
+        #region Add: Button
+        private void Add_Click(object sender, RoutedEventArgs e)
+        {
+            if (GetButtonContent(ButtonAdd) == "Add")
+            {
+                TextBoxTitle.IsEnabled = true;
+                TextBoxDescription.IsEnabled = true;
+                TextBoxTitle.Document.Blocks.Clear();
+                TextBoxDescription.Document.Blocks.Clear();
+                ButtonAdd.Content = "Confirm?";
+            }
+            else if (GetButtonContent(ButtonAdd) == "Confirm?")
+            {
+                selectedNoteToAdd = new Note()
+                {
+                    NoteTitle = new TextRange(TextBoxTitle.Document.ContentStart, TextBoxTitle.Document.ContentEnd).Text,
+                    NoteDescription = new TextRange(TextBoxDescription.Document.ContentStart, TextBoxDescription.Document.ContentEnd).Text
+                };
+
+                using (var db = new NoppeDBEntities())
+                {
+                    db.Notes.Add(this.selectedNoteToAdd);
+                    db.SaveChanges();
+                    DisplayNotes.ItemsSource = null; // reset listbox (This also makes sure that the item source doesnt show the note from before)
+                    listOfNotes = db.Notes.ToList();
+                    DisplayNotes.ItemsSource = listOfNotes;
+                }
+                TextBoxDescription.Document.Blocks.Clear();
+                TextBoxTitle.Document.Blocks.Clear();
+                ButtonAdd.Content = "Add";
+            }
+        }
+        #endregion
+
+        #region Delete: Button
+        private void Delete_Click(object sender, RoutedEventArgs e)
+        {
+            if (GetButtonContent(ButtonDelete) == "Delete")
+            {
+                ButtonDelete.Content = "Confirm?";
+            }
+            else if (GetButtonContent(ButtonDelete) == "Confirm?")
+            {
+                using (var db = new NoppeDBEntities())
+                {
+                    var removeItemID = db.Notes.Find(selectedNoteToAdd.NoteID);
+                    db.Notes.Remove(removeItemID);
+                    db.SaveChanges();
+                    DisplayNotes.ItemsSource = null;
+                    listOfNotes = db.Notes.ToList();
+                    DisplayNotes.ItemsSource = listOfNotes;
+                }
+                TextBoxTitle.Document.Blocks.Clear();
+                TextBoxDescription.Document.Blocks.Clear();
+                ButtonDelete.IsEnabled = false;
+                ButtonEdit.IsEnabled = false;
+                ButtonDelete.Content = "Delete";
+            }
+        }
+        #endregion
+
+
+
+        #endregion
     }
 
 

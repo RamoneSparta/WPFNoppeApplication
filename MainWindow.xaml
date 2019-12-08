@@ -64,9 +64,9 @@
         </TabPanel>
 
         <TabPanel Grid.Row="1" Grid.Column="8" Grid.ColumnSpan="7" Background="#8C7DE8">
-            <Button x:Name="ButtonAdd" Content="Add" Margin="0,0,0,-0.2" Height="33" VerticalAlignment="Top" HorizontalAlignment="Left" Width="89" Click="ButttonAdd_Click"/>
-            <Button x:Name="ButtonEdit" Content="Edit" IsEnabled="False" Margin="-0.4,0,0,-0.2" HorizontalAlignment="Left" Width="88" Height="33" VerticalAlignment="Top" Click="ButtonEdit_Click"/>
-            <Button x:Name="ButtonDelete" Content="Delete" IsEnabled="False" Margin="-0.4,0,4.8,-0.2" HorizontalAlignment="Right" Width="90" Height="33" VerticalAlignment="Top" Click="ButtonDelete_Click"/>
+            <Button x:Name="ButtonAdd" Content="Add" Margin="0,0,0,-0.2" Height="33" VerticalAlignment="Top" HorizontalAlignment="Left" Width="89" Click="Add_Click"/>
+            <Button x:Name="ButtonEdit" Content="Edit" IsEnabled="False" Margin="-0.4,0,0,-0.2" HorizontalAlignment="Left" Width="88" Height="33" VerticalAlignment="Top" Click="Edit_Click"/>
+            <Button x:Name="ButtonDelete" Content="Delete" IsEnabled="False" Margin="-0.4,0,4.8,-0.2" HorizontalAlignment="Right" Width="90" Height="33" VerticalAlignment="Top" Click="Delete_Click"/>
         </TabPanel>
 
 
